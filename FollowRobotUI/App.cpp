@@ -97,8 +97,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		if (x>1300 && x<1370 && y>100 && y<170)
 		{
+			SendMessage(mydlg, WM_SYSCOMMAND, SC_CLOSE, 0);
+			if (DlgThread != NULL)
+			{
+				TerminateThread(DlgThread, 1);
+			}
+			DlgThread = NULL;
 			if (IDYES == MessageBox(hwnd, L"您是否要退出程序", L"提示！！！", MB_YESNO | MB_ICONQUESTION))
 			{
+				
 				HANDLE dancehandle;
 				close_MagneticNavigation();
 				dancehandle = OpenProcess(PROCESS_TERMINATE | SYNCHRONIZE, 0, ProcessToPID(L"dance.exe"));
@@ -144,11 +151,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (jiangjieclick%2==1&&Jiangjievalue)
 		{
 			Jiangjiestage = 1;
-			InvalidateRect(hwnd, &Doctorrect, true);
+			InvalidateRect(hwnd, &Jiangjierect, true);
 			UpdateWindow(hwnd);
 			ComInit(L"COM3", 115200);
 			Sleep(100);
+
 			open_MagneticNavigation();
+			Sleep(100);
+			open_eyes();
+			Sleep(100);
 			char* login_params = "appid = 59c066c4, work_dir = .";
 			if (MSP_SUCCESS != MSPLogin(NULL, NULL, login_params))
 			{
@@ -156,7 +167,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			jiangjieThread = CreateThread(NULL, 0, jiangjieThreadProc, NULL, 0, NULL);
 			CloseHandle(jiangjieThread);
-
 			DlgThread = CreateThread(NULL, 0, DlgThreadProc, NULL, 0, NULL);
 			CloseHandle(DlgThread);
 
@@ -164,9 +174,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		if (jiangjieclick % 2 == 0 && Jiangjievalue)
 		{
+
 			Jiangjiestage = 0;
 			stationindex = 0;
 			close_MagneticNavigation();
+			Sleep(100);
+			close_eyes();
+			Sleep(100);
+
 			ttsValued1 = 0;
 			receiveValued = 0;
 			InvalidateRect(hwnd, &Doctorrect, true);
@@ -1445,22 +1460,28 @@ INT_PTR CALLBACK  DlgProc(HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 		
 		if (x<button1rect.right&&x>button1rect.left&&y<button1rect.bottom&&y>button1rect.top)
 		{
+
 			ttsValued1 = 0;
 			if (com.ttsThread != NULL)
 			{
 				TerminateThread(com.ttsThread, 1);
 			}
 			com.ttsThread = NULL;
+			broadcast(L"dong.wav");
+
 			start_LinePatrol();
 		}
 		if (x<button2rect.right&&x>button2rect.left&&y<button2rect.bottom&&y>button2rect.top)
 		{
+
 			ttsValued1 = 0;
 			if (com.ttsThread != NULL)
 			{
 				TerminateThread(com.ttsThread, 1);
 			}
 			com.ttsThread = NULL;
+			broadcast(L"dong.wav");
+
 			stop_LinePatrol();
 		}
 	}
@@ -1474,11 +1495,17 @@ INT_PTR CALLBACK  DlgProc(HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 				//explain(0);
 				//stationindex++;
 				Correct_MagneticNavigation();
+				Sleep(100);
+				broadcast(L"dong.wav");
+
 			}
 			break;
 			case IDC_BUTTON4:
 			{
 				Set_Sensitivity();
+				Sleep(100);
+				broadcast(L"dong.wav");
+
 			}
 			break;
 		}
@@ -1490,6 +1517,8 @@ INT_PTR CALLBACK  DlgProc(HWND hdlg, UINT message, WPARAM wParam, LPARAM lParam)
 			// 如果执行了关闭  
 			// 销毁对话框，将收到WM_DESTROY消息  
 			DestroyWindow(hdlg);
+			ttsValued1 = 0;
+
 		}
 		return 0;
 	}

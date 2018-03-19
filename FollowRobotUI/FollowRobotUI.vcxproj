@@ -114,6 +114,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="cidaohang.cpp" />
     <ClCompile Include="tts1.cpp" />
     <ClCompile Include="USART.cpp" />
     <ClCompile Include="USART1.cpp" />

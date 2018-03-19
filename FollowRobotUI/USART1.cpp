@@ -1,6 +1,7 @@
 
 #include <iostream>
-#include "USART1.h"
+#include "usart1.h"
+#include"cidaohang.h"
 #include"tts1.h"
 using namespace std;
 bool receiveValued = 1;
@@ -89,6 +90,13 @@ DWORD WINAPI ttsThreadProc(LPVOID lpParameter)
 	explain(stationindex);
 	return 0;
 }
+void angelset(int angel)
+{
+	Sleep(100);
+	angel < 0 ? DipanSet(-50) : DipanSet(50);
+	Sleep(40*abs(angel));
+	DipanSet(0);
+}
 bool Comm1::ReceiveChar()
 {
 	BOOL bRead = TRUE;
@@ -125,12 +133,22 @@ bool Comm1::ReceiveChar()
 				m_Count = 0;
 				//cout << "到站点" << endl;
 				//MessageBox(NULL, L"createdlg error", NULL, SW_SHOWNORMAL);
+
 				stationindex++;
 				 ttsThread = CreateThread(NULL, 0, ttsThreadProc, NULL, 0, NULL);
 				CloseHandle(ttsThread);
 				InvalidateRect(mydlg, NULL, FALSE);
 			}
-			if (m_Count == 6 && Buff[5] == 0x0E)
+			if (m_Count == 7 && Buff[6] == 0x59)//遇到障碍物
+			{
+				m_Count = 0;
+				
+				//cout << "到站点" << endl;
+				//MessageBox(NULL, L"createdlg error", NULL, SW_SHOWNORMAL);
+				tts1("请让一让");
+				PurgeComm(com.hComm, PURGE_RXCLEAR | PURGE_TXCLEAR | PURGE_RXABORT | PURGE_TXABORT);
+			}
+			if (m_Count == 6 && Buff[5] == 0x0E)//开始巡线
 			{
 				m_Count = 0;
 				ttsValued1 = 0;
@@ -246,7 +264,3 @@ bool Comm1::WriteChar(BYTE* m_szWriteBuffer, DWORD m_nToSend)
 	}
 	return true;
 }
-
-
-
-
