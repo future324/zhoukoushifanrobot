@@ -1377,7 +1377,7 @@ DWORD WINAPI DlgThreadProc(LPVOID lpParameter)
 		MessageBox(NULL, L"createdlg error", NULL, SW_SHOWNORMAL);
 		return 0;
 	}
-	
+	//
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
